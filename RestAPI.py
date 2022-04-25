@@ -1,35 +1,54 @@
-from unittest import result
-from flask import Flask
-from flask_restful import Resource, Api, reqparse
+from flask import Flask, request
 import Image
 
 app = Flask(__name__)
-api = Api(app)
 
-class ImageAPI(Resource):
-    def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('imagePath', required=True)
-        args = parser.parse_args()
-        result = Image.getSize(args['imagePath'])
+@app.route('/imageapi', methods=['GET'])
+def getImageSizeAPI():
+    if 'imagePath' not in request.args:
+        return {
+            "Result": "Does not specify imagePath parameter. Image request is invalid."
+        }, 400
+    imagePath = request.args['imagePath']
+    width, height, message = Image.getSize(imagePath)
 
-        if result != (-1, -1):
-            return {
-                "Message": "Get the target image size successfully.",
-                "Data": {
-                    "Width": result[0],
-                    "Height": result[1]
-                }
-            }, 200
-        else:
-            return {
-                "Message": "Failed to get the target image size. Image request is invalid. Please check the latest log under ./Logs folder for more info.",
-                "Data": {
-                    "Width": -1,
-                    "Height": -1
-                }
-            }, 400
+    if width != -1 and height != -1:
+        return {
+            "Result": message,
+            "Data": {
+                "Width": width,
+                "Height": height
+            }
+        }, 200
+    else:
+        return {
+            "Result": message,
+            "Data": {
+                "Width": width,
+                "Height": height
+            }
+        }, 400
 
+@app.route('/imageapi', methods=['POST'])
+def resizeImageAPI():
+    if 'imagePath' not in request.args:
+        return {
+            "Result": "Does not specify imagePath parameter. Image request is invalid."
+        }, 400
+    imagePath = request.args['imagePath']
+    result, message = Image.resize(imagePath)
+    if result:
+        return {
+            "Result": "Target image have been resized to 100*100pt thumbnail successfully.",
+            "Resized Image Path": message
+        }, 200
+    else:
+        return {
+            "Result": "Failed to resize the target image.",
+            "Error Message": message
+        }, 400
 
+    
 
-api.add_resource(ImageAPI, '/imageapi')
+if __name__ == '__main__':
+    app.run()
