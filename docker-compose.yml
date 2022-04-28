@@ -3,6 +3,11 @@ services:
   web:
     build: .
     ports:
-      - "8000:5000"
-  redis:
-    image: "redis:alpine"
+      - "1010:5000"
+    volumes:
+      - type: bind
+        source: ./images
+        target: /ImageResize/images
+      - type: bind
+        source: ./logs
+        target: /ImageResize/logs
