@@ -71,6 +71,7 @@ This application offeres 3 APIs that users could get access to. Their functional
 1. Get Image Size API
     * Effect - Request to get the size of a given image
     * HTTP Method - `GET`
+    * Parameters - `imagePath` (**Mandatory**)
     * Usage - Hit the following URL via cURL or Postman:
     `http://127.0.0.1:5000/imageapi?imagePath=<Your image path>`  
     The parameter `imagePath` is mandatory. You should specify the absolute path of a image by yourself. Notice that all the image paths should start with `/ImageResize/images/`, **as they are the ones in container, not in your laptop**. The path `/ImageResize/images/*` is equivalent to `./images/*`, on your laptop.   
@@ -92,6 +93,7 @@ This application offeres 3 APIs that users could get access to. Their functional
 2. Resize Image API
     * Effect - Request to resize a given image or a given batch of images to 100×100pt thumbnail.
     * HTTP Method - `POST`
+    * Parameters - `imagePath` (**Mandatory**)
     * Usage - Hit the following URL via cURL or Postman:
     `http://127.0.0.1:5000/imageapi?imagePath=<Your image path>`  
     The parameter `imagePath` is mandatory. You should specify the absolute path of a image or a folder by yourself. Notice that all the image paths should start with `/ImageResize/images/`, **as they are the ones in container, not in your laptop**.The path `/ImageResize/images/*` is equivalent to `./images/*` on your laptop.   
@@ -113,6 +115,7 @@ This application offeres 3 APIs that users could get access to. Their functional
 3. Get Result API
     * Effect - Get the task results that was finished processing by Workers.
     * HTTP Method - `GET`
+    * Parameters - `jobId` (**Mandatory**)
     * Usage - Hit the following URL via cURL or Postman:
     `http://127.0.0.1:5000/result?jobId=<Your Own JobID>`  
     The parameter `jobId` is mandatory. You should specify it by utilizing the return results from previous 2 APIs.
@@ -145,6 +148,49 @@ This application offeres 3 APIs that users could get access to. Their functional
 
 You can know more about how to use these 3 APIs in the following 2 sections: Running & Testing.
 
+## Run this Application  
+To properly run this app, please follow the detailed instructions below.
+### Start the application
+Here are the steps to start this application:  
+1. Open the command line tool in your OS.
+    * For Windows, open **Command Prompt**
+    * For Mac OS or Linux, open **Terminal**
+2. Find your best place, and pull this project down. Run the following command:  
+`git clone https://github.com/ProgrammerAsahi/ImageResize.git`  
+3. Move to the root directory of this project, should be under `ImageResize` Folder  
+4. Run `docker compose up`. The first time running may cost some time to complete. If you see the info appears on your terminals like the following one, that means the application is ready:  
+```
+imageresize-web-1     |  * Serving Flask app 'RestAPI.py' (lazy loading)
+imageresize-web-1     |  * Environment: production
+imageresize-web-1     |    WARNING: This is a development server. Do not use it in a production deployment.
+imageresize-web-1     |    Use a production WSGI server instead.
+imageresize-web-1     |  * Debug mode: off
+imageresize-web-1     |  * Running on all addresses (0.0.0.0)
+imageresize-web-1     |    WARNING: This is a development server. Do not use it in a production deployment.
+imageresize-web-1     |  * Running on http://127.0.0.1:5000
+imageresize-web-1     |  * Running on http://172.19.0.2:5000 (Press CTRL+C to quit)
+imageresize-worker-1  | 08:27:12 Worker rq:worker:e3ca0ea9eb404a85af3c77bb3d0b6311: started, version 1.10.1
+imageresize-worker-1  | 08:27:12 Subscribing to channel rq:pubsub:e3ca0ea9eb404a85af3c77bb3d0b6311
+imageresize-worker-1  | 08:27:12 *** Listening on default...
+imageresize-worker-1  | 08:27:12 Cleaning registries for queue: default
+```  
+### Send Requests to the application
+After the application is ready, it will listen to all the web requests at port 5000. Therefore all the web requests should start with `http://127.0.0.1:5000/`  
+As we discussed in previous API section, you are allowed to send web requests to 3 APIs. Here is a summary of them:  
+| No. | Name | Endpoint | Http Method | Mandatory Parameters | Effects|
+| --- | --- | --- | --- | --- | --- |
+| 1 | Get Image Size API | /imageapi | GET | imagePath | Get the size of a image |
+| 2 | Resize Image API | /imageapi | POST | imagePath | Resize a given image or a given batch of image |
+| 3 | Get Result API | /Result | GET | jobId | Get the task results processed by RQ Workers |
 
+For more detailed usage info, please go back to the APIs Overview Section.  
 
+### Stop the Application  
+To stop this app, just press `Ctrl + C` for 2 times, then the app will stop.  
 
+## Test this application
+To properly test this application, both valid inputs & invalid inputs should be covered.  
+Valid inputs will test whether this app could behave as we expects. Different valid inputs should cover different usage scenarios.  
+Invalid inputs will test whether this app is armstrong enough, and could handle various exceptions properly.
+
+### Valid Inputs Test
