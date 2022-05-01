@@ -67,32 +67,84 @@ As listed in `./requirements.txt` file, this application have referenced 4 pytho
 * **RQ (Redis Queue)** - Enable the application to utilize Redis Queue.
 
 ### RESTAPIs Overview
-This application offeres 3 APIs that users could access to. Their functionalities and usage ways are listed below:
+This application offeres 3 APIs that users could get access to. Their functionalities and usage ways are listed below:
 1. Get Image Size API
     * Effect - Request to get the size of a given image
     * HTTP Method - `GET`
     * Usage - Hit the following URL via cURL or Postman:
     `http://127.0.0.1:5000/imageapi?imagePath=<Your image path>`  
-    The parameter `imagePath` is mandatory. You should specify the absolute path of a image by yourself. Notice that all the image paths should start with `/ImageResize/images/`, **these paths should be the ones in container, not in your laptop**.
+    The parameter `imagePath` is mandatory. You should specify the absolute path of a image by yourself. Notice that all the image paths should start with `/ImageResize/images/`, **as they are the ones in container, not in your laptop**.
     * Return - JSON data will be returned. If the request is valid, the API will **return a success message and a jobId** that you could get the result later. Otherwise, it will **return a failure message**.
-    * Example - Use the example image `CogentLabs.jpg`. Send the following request to our application via Postman:  
-    `http://127.0.0.1:5000/imageapi?imagePath=/ImageResize/images/CogentLabs.jpg`
+    * Example - Get the size of example image `CogentLabs.jpg`.  
+        * Start the application
+        * Open Postman, Select the method as `GET`  
+        * Send the following request to this application via Postman:  
+    `http://127.0.0.1:5000/imageapi?imagePath=/ImageResize/images/CogentLabs.jpg`  
+        * The service returns the following JSON data:  
+        ```
+        {  
+            "Result": "Task: Get the size of image [/ImageResize/images/CogentLabs.jpg] has been put into queue",  
+            "jobId": "c99162f2-0b99-4b45-9884-1cc7af3d378d"
+        }
+        ```
+        Notice that you could use the returned `jobId` to further get the processing result from workers in 5 minutes.
+
 2. Resize Image API
     * Effect - Request to resize a given image or a given batch of images to 100×100pt thumbnail.
     * HTTP Method - `POST`
     * Usage - Hit the following URL via cURL or Postman:
     `http://127.0.0.1:5000/imageapi?imagePath=<Your image path>`  
-    The parameter `imagePath` is mandatory. You should specify the absolute path of a image or a folder by yourself. Notice that all the image paths should start with `/ImageResize/images/`, **these paths should be the ones in container, not in your laptop**.  
+    The parameter `imagePath` is mandatory. You should specify the absolute path of a image or a folder by yourself. Notice that all the image paths should start with `/ImageResize/images/`, **as they are the ones in container, not in your laptop**.  
     Also, if you give a single image path, only that target image will be resized. Instead, if you give a directory, all the images which are directly under that folder will be resized (**Not recursive**).
     * Return - JSON data will be returned. If the request is valid, the API will **return a success signal and a jobId** that you could get the result later. Otherwise, it will **return a failure message and a failure signal**.
+    * Example - Resize the example image `CogentLabs.jpg`.  
+        * Start the application
+        * Open Postman, Select the method as `POST`  
+        * Send the following request to this application via Postman:  
+    `http://127.0.0.1:5000/imageapi?imagePath=/ImageResize/images/CogentLabs.jpg`  
+        * The service returns the following JSON data:  
+        ```
+        {  
+            "Result": "Task: Resize image [/ImageResize/images/CogentLabs.jpg] has been put into queue",  
+            "jobId": "6f950a07-7eb6-454e-856b-ab2d15d5efd8"  
+        }
+        ```
+        Notice that you could use the returned `jobId` to further get the processing result from workers in 5 minutes.
 3. Get Result API
-    * Effect - Get the task request that was finished processing by Workers.
+    * Effect - Get the task results that was finished processing by Workers.
     * HTTP Method - `GET`
     * Usage - Hit the following URL via cURL or Postman:
     `http://127.0.0.1:5000/result?jobId=<Your Own JobID>`  
     The parameter `jobId` is mandatory. You should specify it by utilizing the return results from previous 2 APIs.
     * Return - JSON data will be returned. If the jobId is valid, you will see **the image process result returned by those image functions**. Otherwise, you will see **a failure message complains about the invalid jobId or other errors**.
+    * Example - Get the results of previous 2 tasks handling example image `CogentLabs.jpg`.  
+        * Start the application
+        * Open Postman, Select the method as `GET`  
+        * Send the following 2 requests to this application via Postman:  
+        `http://127.0.0.1:5000/result?jobId=c99162f2-0b99-4b45-9884-1cc7af3d378d`  
+        `http://127.0.0.1:5000/result?jobId=6f950a07-7eb6-454e-856b-ab2d15d5efd8`
+
+        * The service returns the following JSON data respectively:  
+        For `jobId=c99162f2-0b99-4b45-9884-1cc7af3d378d`  
+        ```
+        {  
+            "Height": 830,  
+            "Result": "Get the size of target image successfully.",  
+            "Width": 1996
+        } 
+        ```  
+        The data above display that the worker successfully get the size of our example image `CogentLabs.jpg` - its Height & Width are 830 and 1996 respectively.  
+        For `jobId=6f950a07-7eb6-454e-856b-ab2d15d5efd8`
+        ```
+        {  
+            "Message": "/ImageResize/images/resized/CogentLabs_resized.jpg",  
+            "Resize": true  
+        }
+        ```
+        The data above display that the worker successfully resized our example image `CogentLabs.jpg` and stored the new one to path `/ImageResize/images/resized/CogentLabs_resized.jpg`. If you step to the folder `./image/resized/`, you will discovered a small image `CogentLabs_resized.jpg` is generated, which is exactly what we want.
 
 You can know more about how to use these 3 APIs in the following 2 sections: Running & Testing.
+
+
 
 
