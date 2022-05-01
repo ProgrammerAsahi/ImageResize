@@ -25,7 +25,7 @@ This project is a backend web application. It provides image size related servic
 ### Architecture
 Image processing could be time-consuming. To support continous and long running image processing ability, this service has been designed as a task queue based application - more specifically, it uses **Redis Queue** to deal with continuous incoming image tasks. To support the running of Redis Queue, obviously **Redis** is necessary as well. To enable the users to interact with this service, the **RESTAPIs** are provided. Last but not least, there should be **workers** as well to continously deal with images and output results to the users.  
 
-Therefore, the whole application is composed by 4 microservices - **RESTAPIs**, **Redis Queue Workers**, **Redis** & **Redis Queue**. Also, all of them are implemented via **Python**.  
+Therefore, the whole application is composed by 3 microservices - **RESTAPIs**, **Redis Queue & Workers** and **Redis**. Also, all of them are implemented via **Python**.  
 
 To better manage these microservices seperately, **all of them are containerized** via Docker respectively. The following diagaram demonstrates all the main components and their relationships:  
 
@@ -44,7 +44,7 @@ The following diagram could better demonstrate this process:
 
 ![Use Docker Volume to mount files](./docimgs/Volume.jpg)
 
-As the chart above shows, the images & logs writing could be reflected in real time in your host machines project folder, which make this service become both achieveable & monitorable.
+As the chart above shows, the images & logs writing could reflect the run-time behaviors of this service, which make it become both achievable & monitorable.
 
 ### Project Files Overview
 1. Directories  
@@ -73,7 +73,7 @@ This application offeres 3 APIs that users could get access to. Their functional
     * HTTP Method - `GET`
     * Usage - Hit the following URL via cURL or Postman:
     `http://127.0.0.1:5000/imageapi?imagePath=<Your image path>`  
-    The parameter `imagePath` is mandatory. You should specify the absolute path of a image by yourself. Notice that all the image paths should start with `/ImageResize/images/`, **as they are the ones in container, not in your laptop**.
+    The parameter `imagePath` is mandatory. You should specify the absolute path of a image by yourself. Notice that all the image paths should start with `/ImageResize/images/`, **as they are the ones in container, not in your laptop**. The path `/ImageResize/images/*` is equivalent to `./images/*`, which is under the root directory of this project on your laptop.  
     * Return - JSON data will be returned. If the request is valid, the API will **return a success message and a jobId** that you could get the result later. Otherwise, it will **return a failure message**.
     * Example - Get the size of example image `CogentLabs.jpg`.  
         * Start the application
@@ -94,7 +94,7 @@ This application offeres 3 APIs that users could get access to. Their functional
     * HTTP Method - `POST`
     * Usage - Hit the following URL via cURL or Postman:
     `http://127.0.0.1:5000/imageapi?imagePath=<Your image path>`  
-    The parameter `imagePath` is mandatory. You should specify the absolute path of a image or a folder by yourself. Notice that all the image paths should start with `/ImageResize/images/`, **as they are the ones in container, not in your laptop**.  
+    The parameter `imagePath` is mandatory. You should specify the absolute path of a image or a folder by yourself. Notice that all the image paths should start with `/ImageResize/images/`, **as they are the ones in container, not in your laptop**.The path `/ImageResize/images/*` is equivalent to `./images/*`, which is under the root directory of this project on your laptop.  
     Also, if you give a single image path, only that target image will be resized. Instead, if you give a directory, all the images which are directly under that folder will be resized (**Not recursive**).
     * Return - JSON data will be returned. If the request is valid, the API will **return a success signal and a jobId** that you could get the result later. Otherwise, it will **return a failure message and a failure signal**.
     * Example - Resize the example image `CogentLabs.jpg`.  
