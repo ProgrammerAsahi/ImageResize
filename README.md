@@ -33,7 +33,7 @@ To better manage these microservices seperately, **all of them are containerized
 
 As it displays, at the **producer end** of Redis Queue, when service user submits an image request to the RESTAPI, the API will treat it as an image task, and put it into the queue.
 
-On the other hand, at the **consumer end** of the queue, there will be workers handling these image processing task. They take those tasks out of the queue, and utilize **image APIs** to process images. Meanwhile, they will write logs to record their behaviors as well.  
+On the other hand, at the **consumer end** of the queue, there will be workers handling these image processing tasks. They take those tasks out of the queue, and utilize **image APIs** to process images. Meanwhile, they will write logs to record their behaviors as well.  
 When the tasks are done, queue workers will return the result in JSON. Users could either hit the RESTAPI, or directly visit the destination folders, to get their image processing results.  
 
 In addition, to enable the service to read & write image files, the **containers of RESTAPIs & Workers** have been set up to **utilize volumes to mount the image directory in host machines** to both containers. All the images stored under `./images/` folder could be processed by this service.
@@ -60,7 +60,7 @@ As the chart above shows, the images & logs writing could reflect the run-time b
     * **RestAPI.py** - Defined all the REST Endpoints where users could get access to and send image request.
 
 ### Referenced Libraries
-As listed in `./requirements.txt` file, this application have referenced 4 python modules:  
+As listed in `./requirements.txt` file, this application references 4 python modules:  
 * **Flask** - Provides the web framework & facilitates the REST Endpoints development for this project.
 * **Pillow** - Provides necessary image processing APIs. Make it possible for this application to resize images.
 * **Redis** - Enable the application to get access to Redis.
@@ -73,7 +73,7 @@ This application offeres 3 APIs that users could get access to. Their functional
     * HTTP Method - `GET`
     * Usage - Hit the following URL via cURL or Postman:
     `http://127.0.0.1:5000/imageapi?imagePath=<Your image path>`  
-    The parameter `imagePath` is mandatory. You should specify the absolute path of a image by yourself. Notice that all the image paths should start with `/ImageResize/images/`, **as they are the ones in container, not in your laptop**. The path `/ImageResize/images/*` is equivalent to `./images/*`, which is under the root directory of this project on your laptop.  
+    The parameter `imagePath` is mandatory. You should specify the absolute path of a image by yourself. Notice that all the image paths should start with `/ImageResize/images/`, **as they are the ones in container, not in your laptop**. The path `/ImageResize/images/*` is equivalent to `./images/*`, on your laptop.   
     * Return - JSON data will be returned. If the request is valid, the API will **return a success message and a jobId** that you could get the result later. Otherwise, it will **return a failure message**.
     * Example - Get the size of example image `CogentLabs.jpg`.  
         * Start the application
@@ -87,15 +87,15 @@ This application offeres 3 APIs that users could get access to. Their functional
             "jobId": "c99162f2-0b99-4b45-9884-1cc7af3d378d"
         }
         ```
-        Notice that you could use the returned `jobId` to further get the processing result from workers in 5 minutes.
+        Notice that you could use the returned `jobId` to further get the processing result from workers. The result could be kept for 500 seconds.
 
 2. Resize Image API
     * Effect - Request to resize a given image or a given batch of images to 100×100pt thumbnail.
     * HTTP Method - `POST`
     * Usage - Hit the following URL via cURL or Postman:
     `http://127.0.0.1:5000/imageapi?imagePath=<Your image path>`  
-    The parameter `imagePath` is mandatory. You should specify the absolute path of a image or a folder by yourself. Notice that all the image paths should start with `/ImageResize/images/`, **as they are the ones in container, not in your laptop**.The path `/ImageResize/images/*` is equivalent to `./images/*`, which is under the root directory of this project on your laptop.  
-    Also, if you give a single image path, only that target image will be resized. Instead, if you give a directory, all the images which are directly under that folder will be resized (**Not recursive**).
+    The parameter `imagePath` is mandatory. You should specify the absolute path of a image or a folder by yourself. Notice that all the image paths should start with `/ImageResize/images/`, **as they are the ones in container, not in your laptop**.The path `/ImageResize/images/*` is equivalent to `./images/*` on your laptop.   
+    Also, if you give a single image path, only that target image will be resized. Instead, if you give a directory, all the images under that folder will be resized (**Not recursive**).
     * Return - JSON data will be returned. If the request is valid, the API will **return a success signal and a jobId** that you could get the result later. Otherwise, it will **return a failure message and a failure signal**.
     * Example - Resize the example image `CogentLabs.jpg`.  
         * Start the application
@@ -109,7 +109,7 @@ This application offeres 3 APIs that users could get access to. Their functional
             "jobId": "6f950a07-7eb6-454e-856b-ab2d15d5efd8"  
         }
         ```
-        Notice that you could use the returned `jobId` to further get the processing result from workers in 5 minutes.
+        Notice that you could use the returned `jobId` to further get the processing result from workers. The result could be kept for 500 seconds.
 3. Get Result API
     * Effect - Get the task results that was finished processing by Workers.
     * HTTP Method - `GET`
