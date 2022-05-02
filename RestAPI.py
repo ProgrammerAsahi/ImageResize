@@ -17,29 +17,14 @@ Example: curl -X GET http://127.0.0.1:5000/imageapi?imagePath=/ImageResize/image
 def getImageSizeAPI():
     # When the required parameter - imagePath is not provided
     if 'imagePath' not in request.args:
+        message = "Does not specify imagePath parameter. Image request is invalid."
+        writeLog(message, LogLevel.Error)
         return {
-            "Result": "Does not specify imagePath parameter. Image request is invalid."
+            "Result": message
         }, 400
     imagePath = request.args['imagePath']
-    # When the given imagePath does not exist
-    if not exists(imagePath):
-        message = "Image file does not exist."
-        writeLog(message, LogLevel.Error)
-        return {
-            "Width": -1,
-            "Height": -1,
-            "Result": message
-        }, 400
-    # When the given imagePath is not a file
-    if not isfile(imagePath):
-        message = "The given image path is not a file."
-        writeLog(message, LogLevel.Error)
-        return {
-            "Width": -1,
-            "Height": -1,
-            "Result": message
-        }, 400
-    # When the imagePath is valid, will put a new task into Redis Queue
+   
+    # Put the new task into Redis Queue
     job = redisQueue.enqueue(getSize, imagePath)
     message = f"Task: Get the size of image [{imagePath}] has been put into queue"
     writeLog(message, LogLevel.Ok)
@@ -58,18 +43,12 @@ Example: curl -X POST http://127.0.0.1:5000/imageapi?imagePath=/ImageResize/imag
 def resizeImageAPI():
     # When the required parameter - imagePath is not provided
     if 'imagePath' not in request.args:
-        return {
-            "Result": "Does not specify imagePath parameter. Image request is invalid."
-        }, 400
-    imagePath = request.args['imagePath']
-    # When the given imagePath does not start with /ImageResize/images
-    if not imagePath.startswith("/ImageResize/images"):
-        message = "Invalid image path. The path should starts with [/ImageResize/images]."
+        message = "Does not specify imagePath parameter. Image request is invalid."
         writeLog(message, LogLevel.Error)
         return {
-            "Resize": False,
-            "Message": message
+            "Result": message
         }, 400
+    imagePath = request.args['imagePath']
     # When the given imagePath does not exist
     if not exists(imagePath):
         message = "Image file does not exist"
@@ -123,20 +102,32 @@ Example: curl -X GET http://127.0.0.1:5000/result?jobId=<the ID of the target jo
 def getJobResult():
     # When the required parameter - jobId is not provided
     if 'jobId' not in request.args:
+        message = "Does not specify jobId parameter. Image request is invalid."
+        writeLog(message, LogLevel.Error)
         return {
-            "Result": "Does not specify jobId parameter. Image request is invalid."
+            "Result": message
         }, 400
     jobId = request.args['jobId']
-    # When the target job does not exist
     try:
         job = Job.fetch(jobId,connection=redisConnect)
+    # When the target job does not exist
     except Exception as e:
-        abort(404, descrition=e)
+        message = f"An error occured when trying to fetch the job. Error Message: {e}."
+        writeLog(message, LogLevel.Error)
+        return {
+            "Result": message,
+        }, 404
     # When the target job have not finished yet
     if not job.result:
-        abort(404, f"Target job with jobId={jobId} cannot find. Please check its status and try again later.")
+        message = f"Target job with jobId={jobId} cannot find. Please check its status and try again later."
+        writeLog(message, LogLevel.Error)
+        return {
+            "Result": message
+        }, 404
     
-    return job.result
+    return {
+        "Result": job.result
+        }, 200
 
 if __name__ == '__main__':
     app.run()

@@ -17,7 +17,9 @@ If you have not installed git yet, please move here to install their latest stab
 4. A tool that could get access to the REST Service Endpoint of this project. At least one of the following tools should be installed:  
 4.1 **cURL** - A command line tool that could send web requests and transfer data via terminal. To install cURL, Please move here - [cURL](https://curl.se/).   
 4.2 **RESTAPI Testing Software** - An API testing software could help you achieve accessing our APIs as well. Here we suggests to use [Postman](https://www.postman.com/).  
-For myself, I choosed Postman as it is straightforward and easy to operate.
+For myself, I choosed Postman as it is straightforward and easy to operate.  
+5. A Python IDE that could open & manage this project. And could run the 2 Unit Test files in this project.  
+For myself, I choose to use [Visual Studio Code](https://code.visualstudio.com/) with its [Python Extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python) installed.
 
 ## Project Introduction
 This project is a backend web application. It provides image size related services - Get the 2D size of an image, or resize any given images to 100×100pt thumbnail.
@@ -48,16 +50,18 @@ As the chart above shows, the images & logs writing could reflect the run-time b
 
 ### Project Files Overview
 1. Directories  
-    * **docimgs** - Stored all images that are used in this ReadMe  
-    * **images** - Stored all the images that could be processed by this application
-    * **logs** - Stored all the logs written by this application while its running
+    * **docimgs** - includes all images that are used in this ReadMe  
+    * **images** - includes all the images that could be processed by this application
+    * **logs** - stores all the logs written by this application while its running
 2. Files  
-    * **docker-compose.yml** & **Dockerfile** - Recorded detailed configurations of the 4 containers above
+    * **docker-compose.yml** & **Dockerfile** - Recorded detailed configurations of the 3 containers above
     * **Image.py** - Defined all the image APIs that could be utilized by Workers to process images.
     * **log.py** - Defined a log function. Used by RESTAPI & Workers to write logs.
     * **RedisConfig.py** - Set up Redis Server & initialized Redis Queue.
-    * **requirements.txt** - Listed all the python module dependencies that 4 containers need to install.
-    * **RestAPI.py** - Defined all the REST Endpoints where users could get access to and send image request.
+    * **requirements.txt** - Listed all the python module dependencies that 3 containers need to install.
+    * **RestAPI.py** - Defined all the REST Endpoints where users could get access to and send image request.  
+    * **TestImage.py** - Defined all the unit test functions for testing the methods in Image.py.
+    * **TestRestAPI.py** - Defined all the unit test functions for testing the Rest Endpoint methods in RestAPI.py.
 
 ### Referenced Libraries
 As listed in `./requirements.txt` file, this application references 4 python modules:  
@@ -181,7 +185,7 @@ As we discussed in previous API section, you are allowed to send web requests to
 | --- | --- | --- | --- | --- | --- |
 | 1 | Get Image Size API | /imageapi | GET | imagePath | Get the size of a image |
 | 2 | Resize Image API | /imageapi | POST | imagePath | Resize a given image or a given batch of image |
-| 3 | Get Result API | /Result | GET | jobId | Get the task results processed by RQ Workers |
+| 3 | Get Result API | /result | GET | jobId | Get the task results processed by RQ Workers |
 
 For more detailed usage info, please go back to the APIs Overview Section.  
 
@@ -189,8 +193,53 @@ For more detailed usage info, please go back to the APIs Overview Section.
 To stop this app, just press `Ctrl + C` for 2 times, then the app will stop.  
 
 ## Test this application
-To properly test this application, both valid inputs & invalid inputs should be covered.  
-Valid inputs will test whether this app could behave as we expects. Different valid inputs should cover different usage scenarios.  
-Invalid inputs will test whether this app is armstrong enough, and could handle various exceptions properly.
+Unit Tests are prepared in this project. They are defined in `TestImage.py` & `TestRestAPI.py`. All the REST Endpoints methods & image processing methods are covered by these unit test functions. Also, for testing each method, both valid inputs & invalid inputs are covered. Valid inputs will test whether the target method could behave as expected. Invalid inputs will test whether the target method is armstrong enough, and could handle various exceptions properly.
 
-### Valid Inputs Test
+### Unit Test Cases
+Here is a summary of all the unit test cases for testing all the methods in `Image.py` & `RestAPI.py`:  
+| Test Case | Target Method | Input | Valid? | Meet Expection?|  
+| --- | --- | --- | --- | --- |
+| 1 | Image.getSize | Nonexistent imagePath | Invalid | Yes |
+| 2 | Image.getSize | imagePath is a directory | Invalid | Yes |
+| 3 | Image.getSize | imagePath is a non-image file | Invalid | Yes |
+| 4 | Image.getSize | Normal imagePath | Valid | Yes |
+| 5 | Image.resize | imagePath is a non-image file | Invalid | Yes |
+| 6 | Image.resize | Normal imagePath | Valid | Yes |
+| 7 | RestAPI.getImageSizeAPI | a GET Request, imagePath is not provided | Invalid | Yes |
+| 8 | RestAPI.getImageSizeAPI | a GET Request, valid imagePath is provided | Valid | Yes |
+| 9 | RestAPI.resizeImageAPI | a POST Request, imagePath is not provided | Invalid | Yes |
+| 10 | RestAPI.resizeImageAPI | a POST Request, a nonexistent imagePath is provided | Invalid | Yes |
+| 11 | RestAPI.resizeImageAPI | a POST Request, a valid imagePath of an image file is provided | Valid | Yes |
+| 12 | RestAPI.resizeImageAPI | a POST Request, a valid imagePath of a directory is provided | Valid | Yes |
+| 13 | RestAPI.getJobResult | a GET Request, jobId is not provided | Invalid | Yes |
+| 14 | RestAPI.getJobResult | a GET Request, jobId is provided, error occurred when fetching target job | Invalid | Yes |
+| 15 | RestAPI.getJobResult | a GET Request, jobId is provided, the target job is unfinished | Invalid | Yes |
+| 16 | RestAPI.getJobResult | a GET Request, valid jobId is provided, the target job is finished | Valid | Yes |
+
+### Run Unit Tests
+To run the unit tests above, here are the steps:
+1. Open this project with your IDE  
+2. Step to either `TestImage.py` or `TestRestAPI.py`
+3. Hit the **Run** button on your IDE  
+
+Here are the running results I got by using Visual Studio Code with Python 3.9 configured: 
+For running `TestImage.py`:  
+```
+PS D:\ImageResize> & "C:/Program Files/WindowsApps/PythonSoftwareFoundation.Python.3.9_3.9.3312.0_x64__qbz5n2kfra8p0/python3.9.exe" d:/ImageResize/TestImage.py
+......
+----------------------------------------------------------------------
+Ran 6 tests in 0.957s
+
+OK
+```
+For running `TestRestAPI.py`:
+```
+PS D:\ImageResize> & "C:/Program Files/WindowsApps/PythonSoftwareFoundation.Python.3.9_3.9.3312.0_x64__qbz5n2kfra8p0/python3.9.exe" d:/ImageResize/TestRestAPI.py
+..........
+----------------------------------------------------------------------
+Ran 10 tests in 0.083s
+
+OK
+```
+
+Yours should be similar with the results above.

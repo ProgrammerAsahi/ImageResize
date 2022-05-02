@@ -1,4 +1,3 @@
-from asyncore import write
 from PIL import Image
 from PIL import UnidentifiedImageError
 from log import LogLevel, writeLog
@@ -7,6 +6,16 @@ from os.path import *
 # This method Return the 2D sizes of a given image.
 # If the path does not exist, or the path is not a file, or the file is not an image, the method will all return (-1, -1)
 def getSize(imagePath: str):
+    # When the given imagePath does not exist
+    if not exists(imagePath):
+        message = "Image file does not exist."
+        writeLog(message, LogLevel.Error)
+        return { "Width": -1, "Height": -1, "Result": message}
+     # When the given imagePath is not a file
+    if not isfile(imagePath):
+        message = "The given image path is not a file."
+        writeLog(message, LogLevel.Error)
+        return { "Width": -1, "Height": -1, "Result": message}
     try:
         img = Image.open(imagePath)
         width, height = img.size
@@ -26,7 +35,8 @@ def resize(imagePath: str):
         img = Image.open(imagePath)
         img.thumbnail((100, 100))
         fileName = basename(imagePath)
-        savedDirectory = "/ImageResize/images/resized/"
+        currDir = dirname(realpath(__file__))
+        savedDirectory = currDir + "/images/resized/"
         root, ext = splitext(fileName)
         resizedImageName = savedDirectory + root + "_resized" + ext
         img.save(resizedImageName)
