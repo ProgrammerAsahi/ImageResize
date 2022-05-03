@@ -1,4 +1,4 @@
-# ReadMe
+# ReadMe - Xu Li's Assignment
 
 ## Get Started
 Welcome to this image resizing project. This documentation has all the contents you needed to understand, run and test this project. To have the perfect experiences, please follow this readme step by step. Wish you could have fun!
@@ -177,7 +177,7 @@ Here are the steps to start this application:
     * For Windows, open **Command Prompt**
     * For Mac OS or Linux, open **Terminal**
 2. Find your best place, and pull this project down. Run the following command:  
-`git clone https://github.com/ProgrammerAsahi/ImageResize.git`  
+`git clone https://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@github.com/ProgrammerAsahi/ImageResize.git`  
 3. Move to the root directory of this project, should be under `ImageResize` Folder  
 4. If this is your first time running this project, please run `docker compose build`. It may cost some time to complete.
 5. Run `docker compose up`. If you see the info appears on your terminal like the following one, that means the application is ready:  
