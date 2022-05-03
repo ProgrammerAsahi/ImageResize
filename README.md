@@ -236,9 +236,14 @@ Here is a summary of all the unit test cases for testing all the methods in `Ima
 
 ### Run Unit Tests
 To run the unit tests above, here are the steps:
-1. Open this project with your IDE  
-2. Step to either `TestImage.py` or `TestRestAPI.py`
-3. Hit the **Run** button on your IDE  
+1. Since these unit tests will run on your local machine, please make sure your machine has `Python 3` installed, and has the 4 modules in `./requirements.txt` installed. If not, please install `Python 3` first, and then run `pip install -r ./requirements.txt` to install the 4 modules.  
+2. Open this project with your IDE  
+3. Step to either `TestImage.py` or `TestRestAPI.py`
+4. Hit the **Run** button on your IDE  
+5. You could also run these 2 files on your Terminal:  
+`python TestImage.py`  
+`python TestRestAPI.py`  
+They should give you the same result as **Step 4** did.
 
 Here are the running results I got by using Visual Studio Code with Python 3.9 configured:  
 For running `TestImage.py`:  
