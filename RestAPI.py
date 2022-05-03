@@ -86,7 +86,7 @@ def resizeImageAPI():
                 taskCount += 1
                 writeLog(f"Task: Resize image [{item}] has been put into queue", LogLevel.Ok)
         
-        message = f"Processed [{taskCount}] image resizing tasks. Please directly go to [/ImageResize/images/resized/] to check the results."
+        message = f"[{taskCount}] image resizing tasks have been put into queue. Please directly go to [/ImageResize/images/resized/] to check the results."
         writeLog(message, LogLevel.Ok)
         return {
             "Result": message

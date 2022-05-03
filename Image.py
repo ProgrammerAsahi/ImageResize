@@ -2,6 +2,7 @@ from PIL import Image
 from PIL import UnidentifiedImageError
 from log import LogLevel, writeLog
 from os.path import *
+from os import mkdir
 
 # This method Return the 2D sizes of a given image.
 # If the path does not exist, or the path is not a file, or the file is not an image, the method will all return (-1, -1)
@@ -37,6 +38,8 @@ def resize(imagePath: str):
         fileName = basename(imagePath)
         currDir = dirname(realpath(__file__))
         savedDirectory = currDir + "/images/resized/"
+        if not exists(savedDirectory):
+            mkdir(savedDirectory)
         root, ext = splitext(fileName)
         resizedImageName = savedDirectory + root + "_resized" + ext
         img.save(resizedImageName)
