@@ -67,8 +67,8 @@ As the chart above shows, the images & logs writing could reflect the run-time b
 As listed in `./requirements.txt` file, this application references 4 python modules:  
 * **Flask** - Provides the web framework & facilitates the REST Endpoints development for this project.
 * **Pillow** - Provides necessary image processing APIs. Make it possible for this application to resize images.
-* **Redis** - Enable the application to get access to Redis.
-* **RQ (Redis Queue)** - Enable the application to utilize Redis Queue.
+* **Redis** - Enables the application to get access to Redis.
+* **RQ (Redis Queue)** - Enables the application to utilize Redis Queue.
 
 ### RESTAPIs Overview
 This application offeres 3 APIs that users could get access to. Their functionalities and usage ways are listed below:
@@ -222,7 +222,7 @@ To run the unit tests above, here are the steps:
 2. Step to either `TestImage.py` or `TestRestAPI.py`
 3. Hit the **Run** button on your IDE  
 
-Here are the running results I got by using Visual Studio Code with Python 3.9 configured: 
+Here are the running results I got by using Visual Studio Code with Python 3.9 configured:  
 For running `TestImage.py`:  
 ```
 PS D:\ImageResize> & "C:/Program Files/WindowsApps/PythonSoftwareFoundation.Python.3.9_3.9.3312.0_x64__qbz5n2kfra8p0/python3.9.exe" d:/ImageResize/TestImage.py
@@ -243,3 +243,45 @@ OK
 ```
 
 Yours should be similar with the results above.
+
+## Future Improvements
+As this application was just developed in 7 days, it is definitely imperfect and has a lot of places that could improve. The last part of this ReadMe will discuss about these limitations. And then, regarding these shortcomings, provides some possbie solutions in the future.
+
+### Features Aspect
+**Limitation**: This application can only deal with images stored on the local host machine. Also, it requires users to move these images under `./images/` directory. Similarly, for batch processing, currently this application can only support resizing image, other actions are not included. Those images waiting for batch processing are required to put under the same folder. These are obvious limitations to the users.  
+
+**Possible Improvements**: The improved new version should support uploading the image from any location of the file system on users' local machine. Also, it should support dealing with images from the Internet, and from cloud drives, like Google Drive or Dropbox, etc. Same for batch processing, the batch request submitted by users should support images from different locations, and include different actions. Could develop more APIs with different functionalities to realize the improvements above.
+
+### Reliability & Avalibility Aspect
+**Limitation** Currently this application is hosted on a single & local machine. If any unexpected incidents happen to the host machine and make it down, this application will become unavailable to the users as well. Such limited reliability is fine when there are just several users of this application. However, if the user number significantly increases, obviouly current solution is not enough.
+
+**Possible Improvements**: To improve the situation, there are several points we can achieve below:  
+1. At the application level, there could be more exception handling to cover the corner cases as many as possible. Make sure the app will not get stuck because of any invalid user inputs.
+2. At the infrastructrue level, compared to hosting the app on unreliable local machine, we could move it to the cloud and host it on a cloud VM. This is because usually the cloud provider garantees a much higher avalibility than your own local machine. For instance, Azure garantees that their paid VM services would be available **at least 99.9% of the time**. If this is still not enough for us, we could even add more VMs - some are set as primary and others are set as backup. When the primary VMs become unavailable, the backup ones could still keep our service alive.  The number of VMs could be scaled up or down, depending on the workload of our application.  
+This solution is more suitable when the workload is evenly distributed in 24 hours of a day. If they are focused on a certain period of a day, however, this solution may not be the best choice. As in low workload period, these VMs are still costing money.
+3. If the usages of our application are focused on a certain period, for example in business hours in Japan time, we could use serverless computing on the cloud instead. As one of the PaaS, serverless computing could help us run our application without worring about the underlying infrastructure issue. Because it will be automatically scaled up or down by the cloud provider. Also, serverless computing is usually billed by the actual workload - during spare time when there are no workload on our app, we will not be charged by the cloud provider. Take Azure as an example, we could use Azure Container Apps to run this docker-based application. We will get a much higher availability & reliability, with resonable money cost. 
+
+### Performance Aspect
+**Limitation**: Currently, the performance of this application is limited. As it is hosted on a single local machine, the efficiency of handling requests is restricted by the computing power of the local machine. Also, the task data that redis could store is limited by the RAM size of the local machine as well. Therefore, current implemetation of this app cannot support a high loads of requests from lots of users.
+
+**Possible Improvements**: 
+We could improve the performance of this application by applying the following points:  
+1. To support heavy loads of image requests sent to this application, a **distributed system** is definitely necessary. whether it is about queuing the tasks, or processing images, etc. This is because every single machine has its computing limitations. A distributed system allow the requests to be redirected and processed by several machines together. It could enable our application with much better performances.  
+2. Instead of using Redis Queue, a distributed queue system that support much higher loads of data is needed. In this case we could use **Kafka**. As Kafka is able to deal with very high amount of tasks sent by the users. Also, the task data could be kept in a much longer time than redis queue, which enable our users to look up the logs about processing their requests later. Our users could submit their images request at the producer end of Kafka.
+3. For processing images, using **Spark** or **Storm** would be a better choice. As both tools are able to process large amount of data in parallel. We could put either of them at the consumer end of Kafka, let them consume Kafka data and quickly resize the images.
+4. After getting resized by Spark or Storm, we still need a distributed file system to store those large amount of output new images. For example, **Azure Blob Storage** would be an option here.
+5. Combined with the cloud solution I mentioned in previous part, we could utilize the 3 components above or their alternative cloud versions, to form a heavy load tolerated & cloud-based image data pipeline, which is exactly the improved version of our application. Again, for IaaS part, we could scale up and down by adding or deleting computing resources from the VM pool. For PaaS part, the scale up & down could be done automatically by the cloud provider.
+6. Moreover, to futher improve the performance of our application and reduce service latency, we could deploy our services to different regions according to our users' distribution. Requests submitted by users in different places would be redirected to the nearest resource node and get processed.
+
+### Monitoring Aspects
+**Limitations**: The current solution of this application provided basic logs when executing tasks. However, the log content is simple, which only provides us limited health info of this application. Moreover, we are lack of other monitoring tools as well.
+
+**Possible Improvements**:
+The monitoring could be improved via several ways below:
+1. More organized, and useful contents of the logs. This would not only provide us more useful health info, but facilitate us to query these logs better.  
+2. A conveninent tool to query & manage logs. E.g. **Splunk** would be a great option.  
+3. A service health related metrics collector. E.g. **Prometheus** would be a great choice.
+4. A health dashboard that could visualize the health metrics and provide us with more straightforward health info. E.g. Datadog, Azure Data Explorer.
+
+
+
