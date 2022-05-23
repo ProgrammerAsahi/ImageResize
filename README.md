@@ -1,4 +1,4 @@
-# ReadMe - Xu Li's Assignment
+# ReadMe
 
 ## Get Started
 Welcome to this image resizing project. This documentation has all the contents you needed to understand, run and test this project. To have the perfect experiences, please follow this readme step by step. Wish you could have fun!
