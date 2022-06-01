@@ -78,7 +78,7 @@ This application offeres 3 APIs that users could get access to. Their functional
     * Parameters - `imagePath` (**Mandatory**)
     * Usage - Hit the following URL via cURL or Postman:
     `http://127.0.0.1:5000/imageapi?imagePath=<Your image path>`  
-    The parameter `imagePath` is mandatory. You should specify the absolute path of a image by yourself. Notice that all the image paths should start with `/ImageResize/images/`, **as they are the ones in container, not in your laptop**. The path `/ImageResize/images/*` is equivalent to `./images/*`, on your laptop.   
+    The parameter `imagePath` is mandatory. You should specify the absolute path of a image by yourself. Notice that all the image paths should start with `/ImageResize/images/`, **as they are the ones in container, not in your laptop**. The path `/ImageResize/images/*` is equivalent to `./images/*`, on your laptop.  
     * Return - JSON data will be returned. If the request is valid, the API will **return a success message and a jobId** that you could get the result later. Otherwise, it will **return a failure message**.
     * Example - Get the size of example image `CogentLabs.jpg`.  
         * If you want to get the size of your own image, please copy that target image into `./images/` folder. Here we will just use the example image `CogentLabs.jpg`
@@ -98,10 +98,11 @@ This application offeres 3 APIs that users could get access to. Their functional
 2. Resize Image API
     * Effect - Request to resize a given image or a given batch of images to 100×100pt thumbnail.
     * HTTP Method - `POST`
-    * Parameters - `imagePath` (**Mandatory**)
+    * Parameters - `imagePath` (**Mandatory**), `customizedSize` (**Optional**)
     * Usage - Hit the following URL via cURL or Postman:
-    `http://127.0.0.1:5000/imageapi?imagePath=<Your image path>`  
+    `http://127.0.0.1:5000/imageapi?imagePath=<Your image path>&customizedSize=<the target size you want>`  
     The parameter `imagePath` is mandatory. You should specify the absolute path of a image or a folder by yourself. Notice that all the image paths should start with `/ImageResize/images/`, **as they are the ones in container, not in your laptop**.The path `/ImageResize/images/*` is equivalent to `./images/*` on your laptop.   
+    The parameter `customizedSize` is optional. If you specify a number, like 300, the system will resize the image to 300 * 300pt. However, if you do not specify the number, by default the target size would be 100 * 100 pt.  
     Also, if you give a single image path, only that target image will be resized. Instead, if you give a directory, all the images under that folder will be resized (**Not recursive**).
     * Return - JSON data will be returned. If the request is valid, the API will **return a success signal and a jobId** that you could get the result later. Otherwise, it will **return a failure message and a failure signal**.
     * Example 1 - Resize the example image `CogentLabs.jpg`.  
@@ -223,16 +224,17 @@ Here is a summary of all the unit test cases for testing all the methods in `Ima
 | 4 | Image.getSize | Normal imagePath | Valid | Yes |
 | 5 | Image.resize | imagePath is a non-image file | Invalid | Yes |
 | 6 | Image.resize | Normal imagePath | Valid | Yes |
-| 7 | RestAPI.getImageSizeAPI | a GET Request, imagePath is not provided | Invalid | Yes |
-| 8 | RestAPI.getImageSizeAPI | a GET Request, valid imagePath is provided | Valid | Yes |
-| 9 | RestAPI.resizeImageAPI | a POST Request, imagePath is not provided | Invalid | Yes |
-| 10 | RestAPI.resizeImageAPI | a POST Request, a nonexistent imagePath is provided | Invalid | Yes |
-| 11 | RestAPI.resizeImageAPI | a POST Request, a valid imagePath of an image file is provided | Valid | Yes |
-| 12 | RestAPI.resizeImageAPI | a POST Request, a valid imagePath of a directory is provided | Valid | Yes |
-| 13 | RestAPI.getJobResult | a GET Request, jobId is not provided | Invalid | Yes |
-| 14 | RestAPI.getJobResult | a GET Request, jobId is provided, error occurred when fetching target job | Invalid | Yes |
-| 15 | RestAPI.getJobResult | a GET Request, jobId is provided, the target job is unfinished | Invalid | Yes |
-| 16 | RestAPI.getJobResult | a GET Request, valid jobId is provided, the target job is finished | Valid | Yes |
+| 7 | Image.resize | Normal imagePath & valid customized size | Valid | Yes |
+| 8 | RestAPI.getImageSizeAPI | a GET Request, imagePath is not provided | Invalid | Yes |
+| 9 | RestAPI.getImageSizeAPI | a GET Request, valid imagePath is provided | Valid | Yes |
+| 10 | RestAPI.resizeImageAPI | a POST Request, imagePath is not provided | Invalid | Yes |
+| 11 | RestAPI.resizeImageAPI | a POST Request, a nonexistent imagePath is provided | Invalid | Yes |
+| 12 | RestAPI.resizeImageAPI | a POST Request, a valid imagePath of an image file is provided | Valid | Yes |
+| 13 | RestAPI.resizeImageAPI | a POST Request, a valid imagePath of a directory is provided | Valid | Yes |
+| 14 | RestAPI.getJobResult | a GET Request, jobId is not provided | Invalid | Yes |
+| 15 | RestAPI.getJobResult | a GET Request, jobId is provided, error occurred when fetching target job | Invalid | Yes |
+| 16 | RestAPI.getJobResult | a GET Request, jobId is provided, the target job is unfinished | Invalid | Yes |
+| 17 | RestAPI.getJobResult | a GET Request, valid jobId is provided, the target job is finished | Valid | Yes |
 
 ### Run Unit Tests
 To run the unit tests above, here are the steps:
@@ -251,7 +253,7 @@ For running `TestImage.py`:
 PS D:\ImageResize> & "C:/Program Files/WindowsApps/PythonSoftwareFoundation.Python.3.9_3.9.3312.0_x64__qbz5n2kfra8p0/python3.9.exe" d:/ImageResize/TestImage.py
 ......
 ----------------------------------------------------------------------
-Ran 6 tests in 0.957s
+Ran 7 tests in 0.957s
 
 OK
 ```

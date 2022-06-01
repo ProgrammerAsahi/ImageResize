@@ -60,7 +60,15 @@ def resizeImageAPI():
     # When the given imagePath is a file
     if isfile(imagePath):
         # Put a new task into Redis Queue
-        job = redisQueue.enqueue(resize, imagePath)
+        job = None
+        # When user specified the customized size
+        if 'customizedSize' in request.args:
+            customizedSize = request.args['customizedSize']
+            customizedSize = int(customizedSize)
+            writeLog(f"Resize the image to [{customizedSize}]", LogLevel.Ok)
+            job = redisQueue.enqueue(resize, args=(imagePath, customizedSize))
+        else:
+            job = redisQueue.enqueue(resize, imagePath)
         message = f"Task: Resize image [{imagePath}] has been put into queue"
         writeLog(message, LogLevel.Ok)
         return {
@@ -82,7 +90,14 @@ def resizeImageAPI():
                 continue
             else:
                 # Each image will be a seperate task and be put into Redis Queue
-                redisQueue.enqueue(resize, item)
+                # When user specified customized size
+                if 'customizedSize' in request.args:
+                    customizedSize = request.args['customizedSize']
+                    customizedSize = int(customizedSize)
+                    writeLog(f"Resize the image to [{customizedSize}]", LogLevel.Ok)
+                    redisQueue.enqueue(resize, args=(item, customizedSize))
+                else:
+                    redisQueue.enqueue(resize, item)
                 taskCount += 1
                 writeLog(f"Task: Resize image [{item}] has been put into queue", LogLevel.Ok)
         

@@ -29,19 +29,21 @@ def getSize(imagePath: str):
         writeLog(message, LogLevel.Error)
         return {"Width": -1, "Height": -1, "Result": message}
 
-# This method resizes the given images to 100*100 px thumbnails
+# This method resizes the given images to customizedSize. If the users have not specified the size, the default size would be 100*100 pt
 # If resizes successfully, the method will return True; otherwise, the method will return False
-def resize(imagePath: str):
+def resize(imagePath: str, customizedSize=100):
     try:
+        writeLog(f"Try to resize image. The customized size is [{customizedSize}].", LogLevel.Ok)
         img = Image.open(imagePath)
-        img.thumbnail((100, 100))
+        img.thumbnail((customizedSize, customizedSize))
         fileName = basename(imagePath)
         currDir = dirname(realpath(__file__))
         savedDirectory = currDir + "/images/resized/"
         if not exists(savedDirectory):
             mkdir(savedDirectory)
         root, ext = splitext(fileName)
-        resizedImageName = savedDirectory + root + "_resized" + ext
+        newSize = str(customizedSize)
+        resizedImageName = savedDirectory + root + f"_resizedTo{newSize}" + ext
         img.save(resizedImageName)
         writeLog(f"Successfully generated the resized image [{resizedImageName}].", LogLevel.Ok)
         return {"Resize": True, "Message": resizedImageName}

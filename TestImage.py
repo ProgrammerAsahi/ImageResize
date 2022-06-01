@@ -59,8 +59,21 @@ class TestImageMethods(unittest.TestCase):
     def testResizeImageWithValidImagePath(self):
         currDir = dirname(realpath(__file__))
         imagePath = currDir + "/images/CogentLabs.jpg"
-        savedImagePath = currDir + "/images/resized/CogentLabs_resized.jpg"
+        savedImagePath = currDir + "/images/resized/CogentLabs_resizedTo100.jpg"
         result = resize(imagePath)
+        self.assertTrue("Resize" in result)
+        self.assertTrue("Message" in result)
+        self.assertTrue(result["Resize"])
+        self.assertEqual(result["Message"], savedImagePath)
+        self.assertTrue(exists(savedImagePath))
+    
+    # Test the Image.resize method, when imagePath is a valid image file and customized size is specified
+    def testResizeImageWithValidImagePathAndCustomizedSize(self):
+        currDir = dirname(realpath(__file__))
+        imagePath = currDir + "/images/CogentLabs.jpg"
+        savedImagePath = currDir + "/images/resized/CogentLabs_resizedTo300.jpg"
+        customizedSize = 300
+        result = resize(imagePath, customizedSize)
         self.assertTrue("Resize" in result)
         self.assertTrue("Message" in result)
         self.assertTrue(result["Resize"])
